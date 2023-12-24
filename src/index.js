@@ -1,50 +1,29 @@
-const http = require("http");
+const express = require("express");
 const dotenv = require("dotenv");
 
 dotenv.config();
 
-const routes = {
-  "/about": (req, res) => {
-    res.write("<h1>about us page<h1>");
-    res.end();
-  },
-  "/contact": (req, res) => {
-    res.write("<h1>contact us page<h1>");
-    res.end();
-  },
-};
-
-class RouteManager {
-  req;
-  res;
-  expectedRoute;
-
-  constructor(req, res) {
-    this.req = req;
-    this.res = res;
-    this.expectedRoute = req.url;
-  }
-
-  exectute() {
-    if (this.expectedRoute in routes) {
-      return routes[this.expectedRoute](this.req, this.res);
-    }
-
-    this.fallback();
-  }
-
-  fallback() {
-    this.res.write("<h1>Hello World!<h1>");
-    this.res.write("<h2>My name Maks<h2>");
-    this.res.end();
-  }
-}
-
-const server = http.createServer((req, res) => {
-  new RouteManager(req, res).exectute();
-});
-
 const port = process.env.PORT;
-server.listen(port, () => {
-  console.log(`Server started at: http://localhost:${port}/`);
+const app = express();
+
+const products = [
+  { id: 1, name: "Product 1", brand: "Brand A" },
+  { id: 2, name: "Product 2", brand: "Brand B" },
+  { id: 3, name: "Product 3", brand: "Brand A" },
+];
+
+app.get("/", (req, res) => {
+  res.send("response for GET request");
 });
+
+app.get("/products/:brand", (req, res) => {
+  const { brand } = req.params;
+
+  const filteredProducts = products.filter(
+    (product) => product.brand === brand
+  );
+
+  res.json(filteredProducts);
+});
+
+app.listen(port, () => console.log(`Server started on port: ${port}`));
